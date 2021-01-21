@@ -1,0 +1,14 @@
+{
+	"name": "com.unity.todotree",
+	"displayName":"TODO Tree",
+	"version": "1.0.0",
+    "unity": "2019.4",
+    "keywords": ["todo",
+        "tree",
+        "todotree"
+    ],
+    "category": "Todo",
+	"description": "TODO Tree for Unity\n\nThis supports TODO and FIXME which are default settings. You can add more custom settings in the TodoConfig asset.",
+    "dependencies": {
+    }
+}
