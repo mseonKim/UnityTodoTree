@@ -23,13 +23,16 @@ namespace UnityEditor.Todo
 
 		// Controllers
 		private Tag _currentTag;
-		private bool _showTodoGroup;
 		private TodoGroup _selectedGroup;
 		private Todo _selectedTodo;
+		private bool _showTodoGroup;
 		private bool _hasSelectedTodoChanged;
 		private string _searchString;
 		private Vector2 _sidebarScrollPos;
         private Vector2 _todoAreaScrollPos;
+		private bool _hasTodoDragStarted;
+		private int _startTodoDragIndex = -1;	// -1: null, others: valid indices
+		private float _startTodoDragPosY;
 		
 
 		[MenuItem("Window/TODO Tree")]
@@ -175,10 +178,11 @@ namespace UnityEditor.Todo
 						return;
 					}
 					
-					foreach (Todo todo in _selectedGroup.todos)
+					for(int i = 0; i < _selectedGroup.todos.Count; i++)
 					{
+						Todo todo = _selectedGroup.todos[i];
 						bool hasModified = false;
-						TodoField(todo, ref hasModified);
+						TodoField(i, ref todo, ref hasModified);
 						if (hasModified)
 							break;
 					}
@@ -186,14 +190,22 @@ namespace UnityEditor.Todo
 				}
 			}
 
-			// Reset selectedTodo
-			if (e.isMouse && e.type == EventType.MouseDown
-				&& _hasSelectedTodoChanged == false
-				&& GUILayoutUtility.GetLastRect().Contains(e.mousePosition))
+			// Reset values
+			if (e.isMouse && e.type == EventType.MouseDown && GUILayoutUtility.GetLastRect().Contains(e.mousePosition))
 			{
-				SetSelectedTodo(null);
+				if (_hasSelectedTodoChanged == false)
+				{
+					SetSelectedTodo(null);
+				}
+
+				if (_hasTodoDragStarted == false && _startTodoDragIndex >= 0)
+				{
+					_startTodoDragIndex = -1;
+				}
 			}
+
 			_hasSelectedTodoChanged = false;
+			_hasTodoDragStarted = false;
 		}
 
 		/** Toolbar Functions */
@@ -408,7 +420,7 @@ namespace UnityEditor.Todo
 
 
 		/** Todo Area Functions */
-		private void TodoField(Todo todo, ref bool hasModified)
+		private void TodoField(int index, ref Todo todo, ref bool hasModified)
 		{
 			GUIStyle fieldStyle = new GUIStyle(GUI.skin.box);
 			Event e = Event.current;
@@ -436,12 +448,8 @@ namespace UnityEditor.Todo
 				TodoRemoveButton(ref todo, spaceHeight, ref hasModified);
 			}
 
-			// TODO: Drag box to rearrange
-			Rect fieldRect = GUILayoutUtility.GetLastRect();
-			if (e.isMouse && e.type == EventType.MouseDown && fieldRect.Contains(e.mousePosition))
-			{
-
-			}
+			// Rearrange field
+			RearrangeTodoField(ref e, index);
 		}
 
 		private void TodoTitleField(ref Todo todo)
@@ -450,14 +458,14 @@ namespace UnityEditor.Todo
 			if (_selectedTodo == todo)
 			{
 				GUIStyle style = new GUIStyle(GUI.skin.textField);
-				style.fontSize = 16;
+				style.fontSize = 15;
 				todo.title = GUILayout.TextField(todo.title, style, GUILayout.MinWidth((float)TodoLayout.MinTodoTitleWidth));
 			}
 			else
 			{
 				GUIStyle style = new GUIStyle(GUI.skin.label);
 				style.fontStyle = FontStyle.Bold;
-				style.fontSize = 16;
+				style.fontSize = 15;
 				GUILayout.Label(todo.title, style, GUILayout.MinWidth((float)TodoLayout.MinTodoTitleWidth));
 			}
 
@@ -527,7 +535,7 @@ namespace UnityEditor.Todo
 		}
 
 
-		/** Setting Functions */
+		/** Util Functions */
 
 		async private void SetCurrentTag(Tag tag)
 		{
@@ -555,6 +563,45 @@ namespace UnityEditor.Todo
 		private void SetSelectedTodo(Todo todo)
 		{
 			_selectedTodo = todo;
+		}
+
+		private void RearrangeTodoField(ref Event e, int index)
+		{
+			Rect fieldRect = GUILayoutUtility.GetLastRect();
+
+			// On Drag Start
+			if (e.isMouse)
+			{
+				if (e.type == EventType.MouseDown && fieldRect.Contains(e.mousePosition))
+				{
+					_hasTodoDragStarted = true;
+					_startTodoDragIndex = index;
+					_startTodoDragPosY = e.mousePosition.y;
+				}
+
+				// On Dragging
+
+
+				// On Drag End
+				if (_startTodoDragIndex >= 0 && e.type == EventType.MouseUp)
+				{
+					// Calculate destination index
+					int diff = (int)((e.mousePosition.y - _startTodoDragPosY) / (float)TodoLayout.TodoFieldHeight);
+					int dest = (int)Mathf.Clamp(_startTodoDragIndex + diff, 0f, _selectedGroup.todos.Count - 1);
+
+					// Swap items
+					SwapTodo(_startTodoDragIndex, dest);
+
+					_startTodoDragIndex = -1;
+				}
+			}
+		}
+
+		private void SwapTodo(int first, int second)
+		{
+			Todo temp = _selectedGroup.todos[first];
+			_selectedGroup.todos[first] = _selectedGroup.todos[second];
+			_selectedGroup.todos[second] = temp;
 		}
 
 
