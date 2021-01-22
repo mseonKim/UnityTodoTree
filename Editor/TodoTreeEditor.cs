@@ -31,8 +31,9 @@ namespace UnityEditor.Todo
 		private Vector2 _sidebarScrollPos;
         private Vector2 _todoAreaScrollPos;
 		private bool _hasTodoDragStarted;
-		private int _startTodoDragIndex = -1;	// -1: null, others: valid indices
 		private float _startTodoDragPosY;
+		private int _startTodoDragIndex = -1;			// -1: null, others: valid indices
+		private int _expectedTodoDragIndex = -1;		// -1: null, others: valid indices
 		
 
 		[MenuItem("Window/TODO Tree")]
@@ -140,7 +141,7 @@ namespace UnityEditor.Todo
 					// Fill contents
 					for (int i = 0; i < _visibleGroups.Count; i++)
 					{
-						DrawTodoGroupField(i);
+						TodoGroupField(i);
 						GUILayout.Space((float)TodoLayout.SidebarSpace);
 					}
 				}
@@ -154,8 +155,8 @@ namespace UnityEditor.Todo
 					return;
 				}
 				
-				// Display Todo Groups
-				DisplayTodoGroups();
+				// Display selected Todo group
+				DisplaySelectedTodoGroup();
 
 				// Display Add & Remove group butons
 				DisplayTodoGroupButtons();
@@ -171,18 +172,32 @@ namespace UnityEditor.Todo
 			{
 				using (new ScrollViewGroup(ref _todoAreaScrollPos))
 				{
-					// Fill contents
 					if (_selectedGroup == null)
 					{
 						GUILayout.Label("No asset selected.");
 						return;
 					}
+
+					// Show group's title
+					GUIStyle labelStyle = new GUIStyle(GUI.skin.label);
+					labelStyle.fontSize = 26;
+					labelStyle.fontStyle = FontStyle.Bold;
+					GUILayout.Label(_selectedGroup.title, labelStyle);
 					
 					for(int i = 0; i < _selectedGroup.todos.Count; i++)
 					{
+						// Show expected drag field
+						if (_expectedTodoDragIndex == i)
+						{
+							GUILayout.Space(20f);
+						}
+
+						// Show todo field
 						Todo todo = _selectedGroup.todos[i];
 						bool hasModified = false;
 						TodoField(i, ref todo, ref hasModified);
+
+						// Break if modified
 						if (hasModified)
 							break;
 					}
@@ -194,22 +209,18 @@ namespace UnityEditor.Todo
 			if (e.isMouse && e.type == EventType.MouseDown && GUILayoutUtility.GetLastRect().Contains(e.mousePosition))
 			{
 				if (_hasSelectedTodoChanged == false)
-				{
 					SetSelectedTodo(null);
-				}
 
 				if (_hasTodoDragStarted == false && _startTodoDragIndex >= 0)
-				{
 					_startTodoDragIndex = -1;
-				}
 			}
 
 			_hasSelectedTodoChanged = false;
 			_hasTodoDragStarted = false;
 		}
 
-		/** Toolbar Functions */
 
+		/** Toolbar Functions */
 		private void TagField()
 		{
 			GUIStyle style = _currentTag == null ? "Label" : "Button";
@@ -270,17 +281,16 @@ namespace UnityEditor.Todo
 
 
 		/** Sidebar Functions */
-
-		private void DrawTodoGroupField(int index)
+		private void TodoGroupField(int index)
 		{
 			Event e = Event.current;
 			TodoGroup group = _visibleGroups[index];
 			GUIStyle labelStyle = EditorStyles.label;
 
+			// Set style depends on whether selected group
 			if (_selectedGroup != null)
 			{
 				Color backgroundColor = group.tag.color == Color.white ? Color.black : group.tag.color;
-				// Change style if selected group
 				if (_selectedGroup == _visibleGroups[index])
 				{
 					GUI.backgroundColor = backgroundColor;
@@ -290,7 +300,8 @@ namespace UnityEditor.Todo
 					GUI.backgroundColor = Color.white;
 			}
 
-			using (new HorizontalGroup(EditorStyles.helpBox, GUILayout.MinHeight((float)TodoLayout.MinGroupFieldHeight)))
+			// Show todo group
+			using (new HorizontalGroup(EditorStyles.helpBox, GUILayout.Height((float)TodoLayout.TodoGroupFieldHeight)))
 			{
 				GUI.color = group.tag.color;
 
@@ -301,11 +312,14 @@ namespace UnityEditor.Todo
 				GUI.backgroundColor = Color.white;
 			}
 
+			// On clicked
 			if (e.isMouse && e.type == EventType.MouseDown && GUILayoutUtility.GetLastRect().Contains(e.mousePosition))
+			{
 				SetSelectedGroup(index);
+			}
 		}
 
-		private void DisplayTodoGroups()
+		private void DisplaySelectedTodoGroup()
 		{
 			if (_selectedGroup == null || _showTodoGroup == false)
 				return;
@@ -412,7 +426,6 @@ namespace UnityEditor.Todo
 			}
 		}
 
-
 		private void HideTodoGroup()
 		{
 			_showTodoGroup = false;
@@ -424,7 +437,11 @@ namespace UnityEditor.Todo
 		{
 			GUIStyle fieldStyle = new GUIStyle(GUI.skin.box);
 			Event e = Event.current;
-			
+
+			// Notify if dragging
+			if (_startTodoDragIndex == index)
+				GUI.backgroundColor = new Color(0.2f, 0.1f, 1f, 0.4f);
+
 			using (new HorizontalGroup(fieldStyle, GUILayout.Height((float)TodoLayout.TodoFieldHeight)))
 			{
 				// Title & Description
@@ -448,13 +465,17 @@ namespace UnityEditor.Todo
 				TodoRemoveButton(ref todo, spaceHeight, ref hasModified);
 			}
 
-			// Rearrange field
-			RearrangeTodoField(ref e, index);
+			GUI.backgroundColor = Color.white;
+
+			// Rearrange fields
+			RearrangeTodoFields(ref e, index);
 		}
 
 		private void TodoTitleField(ref Todo todo)
 		{
 			Event e = Event.current;
+
+			// Switch to textfield if clicked
 			if (_selectedTodo == todo)
 			{
 				GUIStyle style = new GUIStyle(GUI.skin.textField);
@@ -469,6 +490,7 @@ namespace UnityEditor.Todo
 				GUILayout.Label(todo.title, style, GUILayout.MinWidth((float)TodoLayout.MinTodoTitleWidth));
 			}
 
+			// Update selectedTodo
 			if (e.isMouse && e.type == EventType.MouseDown && GUILayoutUtility.GetLastRect().Contains(e.mousePosition))
 			{
 				SetSelectedTodo(todo);
@@ -525,7 +547,7 @@ namespace UnityEditor.Todo
 
 			if (GUILayout.Button("+", GUILayout.Height(25f)))
 			{
-				string defaultName = "Todo " + (_selectedGroup.todos.Count + 1);
+				string defaultName = _selectedGroup.tag.name + " " + (_selectedGroup.todos.Count + 1);
 				Todo todo = new Todo(defaultName, "", _config.GetProgressByIndex(0), _config.GetPriorityByIndex(0), null);
 				_selectedGroup.AddTodo(ref todo);
 			}
@@ -536,7 +558,6 @@ namespace UnityEditor.Todo
 
 
 		/** Util Functions */
-
 		async private void SetCurrentTag(Tag tag)
 		{
 			await Task.Delay(10);
@@ -565,13 +586,13 @@ namespace UnityEditor.Todo
 			_selectedTodo = todo;
 		}
 
-		private void RearrangeTodoField(ref Event e, int index)
+		private void RearrangeTodoFields(ref Event e, int index)
 		{
 			Rect fieldRect = GUILayoutUtility.GetLastRect();
 
-			// On Drag Start
 			if (e.isMouse)
 			{
+				// Set dragging values if dragging has started
 				if (e.type == EventType.MouseDown && fieldRect.Contains(e.mousePosition))
 				{
 					_hasTodoDragStarted = true;
@@ -579,29 +600,26 @@ namespace UnityEditor.Todo
 					_startTodoDragPosY = e.mousePosition.y;
 				}
 
-				// On Dragging
+				// Update expected index if dragging
+				if (_startTodoDragIndex >= 0 && e.type == EventType.MouseDrag)
+				{
+					_expectedTodoDragIndex = GetExpectedTodoDragIndex(e.mousePosition.y);
+				}
 
-
-				// On Drag End
+				// Rearrange items if dragging has ended
 				if (_startTodoDragIndex >= 0 && e.type == EventType.MouseUp)
 				{
-					// Calculate destination index
-					int diff = (int)((e.mousePosition.y - _startTodoDragPosY) / (float)TodoLayout.TodoFieldHeight);
-					int dest = (int)Mathf.Clamp(_startTodoDragIndex + diff, 0f, _selectedGroup.todos.Count - 1);
-
-					// Swap items
-					SwapTodo(_startTodoDragIndex, dest);
-
+					_selectedGroup.RearrangeTodos(_startTodoDragIndex, GetExpectedTodoDragIndex(e.mousePosition.y));
 					_startTodoDragIndex = -1;
+					_expectedTodoDragIndex = -1;
 				}
 			}
 		}
 
-		private void SwapTodo(int first, int second)
+		private int GetExpectedTodoDragIndex(float mouseY)
 		{
-			Todo temp = _selectedGroup.todos[first];
-			_selectedGroup.todos[first] = _selectedGroup.todos[second];
-			_selectedGroup.todos[second] = temp;
+			int diff = (int)((mouseY - _startTodoDragPosY) / (float)TodoLayout.TodoFieldHeight);
+			return (int)Mathf.Clamp(_startTodoDragIndex + diff, 0f, _selectedGroup.todos.Count - 1);
 		}
 
 

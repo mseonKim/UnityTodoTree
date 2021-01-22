@@ -9,7 +9,7 @@ namespace UnityEditor.Todo
 		SidebarSpace = 4,
 		MinSidebarWidth = 120,
 		MaxSidebarWidth = 480,
-		MinGroupFieldHeight = 30,
+		TodoGroupFieldHeight = 30,
 		MinTodoGroupHeight = 200,
 		TodoGroupTitleHeight = 25,
 		TodoGroupSpace = 5,

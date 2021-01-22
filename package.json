@@ -8,7 +8,7 @@
         "todotree"
     ],
     "category": "Todo",
-	"description": "TODO Tree for Unity\n\nThis supports TODO and FIXME which are default settings. You can add more custom settings in the TodoConfig asset.",
+	"description": "The TODO Tree for Unity\n\nSupport Features:\n\n    1. Tag\t\t(TODO, FIXME)\n    2. Prority\t(Minor, Medium, Major)\n    3. Progress\t(Active, On-Hold, Completed)\n\nCan edit settings in the TodoConfig asset.",
     "dependencies": {
     }
 }

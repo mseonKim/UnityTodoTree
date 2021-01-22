@@ -44,6 +44,13 @@ namespace UnityEditor.Todo
         {
             _todos.Remove(todo);
         }
+
+        public void RearrangeTodos(int start, int dest)
+        {
+            Todo temp = _todos[start];
+			_todos.RemoveAt(start);
+			_todos.Insert(dest, temp);
+        }
     }
 
 }
