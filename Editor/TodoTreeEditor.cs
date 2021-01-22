@@ -117,8 +117,10 @@ namespace UnityEditor.Todo
 
 		private void Toolbar()
 		{
+			GUIStyle style = new GUIStyle(EditorStyles.toolbar);
+			style.fixedHeight = (float)TodoLayout.ToolbarHeight;
 			// Draw Tags & Search bar
-			using (new HorizontalGroup(EditorStyles.toolbar))
+			using (new HorizontalGroup(style))
 			{
 				TagField();
 				GUILayout.FlexibleSpace();
@@ -340,8 +342,12 @@ namespace UnityEditor.Todo
 					labelStyle.fontSize = 14;
 					labelStyle.padding = new RectOffset(4, 4, 4, 4);
 					labelStyle.normal.textColor = Color.white;
-					GUILayout.Label("Info", labelStyle);
-					if (GUILayout.Button("", "ToolbarSeachCancelButton"))
+					GUILayout.Label("INFO", labelStyle);
+					
+					GUIStyle buttonStyle = new GUIStyle(GUI.skin.label);
+					buttonStyle.fontSize = 16;
+					buttonStyle.fontStyle = FontStyle.Bold;
+					if (GUILayout.Button("x", buttonStyle, GUILayout.Width(20f)))
 					{
 						HideTodoGroup();
 					}

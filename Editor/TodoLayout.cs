@@ -5,6 +5,7 @@ namespace UnityEditor.Todo
 {
     public enum TodoLayout
 	{
+		ToolbarHeight = 24,
 		MinSearchbarWidth = 250,
 		SidebarSpace = 4,
 		MinSidebarWidth = 120,
