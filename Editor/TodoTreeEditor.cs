@@ -1,10 +1,6 @@
-using System;
 using System.Threading.Tasks;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
-using UnityEditor;
 
 namespace UnityEditor.Todo
 {
@@ -58,7 +54,7 @@ namespace UnityEditor.Todo
 				return;
 			}
 
-			// Display Todo
+			// Display Todo Tree
 			Toolbar();
 			using (new HorizontalGroup())
 			{
@@ -420,9 +416,12 @@ namespace UnityEditor.Todo
 
 			if (GUILayout.Button("-", GUILayout.Height((float)TodoLayout.CreateGroupButtonHeight)))
 			{
-				_data.RemoveGroup(ref _selectedGroup);
-				RefreshVisibleGroups();
-				HideTodoGroup();
+				if (_selectedGroup.todos.Count == 0)
+				{
+					_data.RemoveGroup(ref _selectedGroup);
+					RefreshVisibleGroups();
+					HideTodoGroup();
+				}
 			}
 		}
 
