@@ -1,4 +1,5 @@
-# TODO Tree for Unity
+# Unity Todo Tree
+The TODO Tree for Unity Editor (recommend version: >=2019.4)
 
 
 ## Support Features
@@ -13,4 +14,4 @@ You can add your custom settings in TodoConfig.asset. (+ color for each of them)
 
 ## Example
 
-![image](https://user-images.githubusercontent.com/77778881/105455437-d3b3fb80-5cc6-11eb-9c56-7221de688fb7.png)
+![image](https://user-images.githubusercontent.com/77778881/105460595-5d67c700-5ccf-11eb-8c8b-217fc66744bd.png)
