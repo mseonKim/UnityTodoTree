@@ -8,7 +8,7 @@ namespace UnityEditor.Todo
 	{
 		// Singleton
 		private static TodoTreeEditor _editor;
-
+		
 		// Data
 		private string _todoDirectoryPath = "/Editor/TodoTree/";
 		private string _todoConfigPath = "Assets/Editor/TodoTree/TodoConfig.asset";
@@ -275,6 +275,8 @@ namespace UnityEditor.Todo
                 _searchString = "";
                 GUI.FocusControl(null);
             }
+
+			// TODO: implement search
 		}
 
 
@@ -374,7 +376,7 @@ namespace UnityEditor.Todo
 				using (new HorizontalGroup())
 				{
 					GUILayout.Label("Asset ", GUILayout.ExpandWidth(false));
-					_selectedGroup.reference = EditorGUILayout.ObjectField(_selectedGroup.reference, typeof(UnityEngine.Object), false);
+					_selectedGroup.reference = EditorGUILayout.ObjectField(_selectedGroup.reference, typeof(UnityEngine.Object), true);
 				}
 
 				// Note
@@ -426,7 +428,7 @@ namespace UnityEditor.Todo
 				{
 					_data.RemoveGroup(ref _selectedGroup);
 					RefreshVisibleGroups();
-					HideTodoGroup();
+					SetSelectedGroup(-1);
 				}
 			}
 		}
@@ -580,8 +582,16 @@ namespace UnityEditor.Todo
 		async private void SetSelectedGroup(int index)
 		{
 			await Task.Delay(10);
-			_showTodoGroup = true;
-			_selectedGroup = _visibleGroups[index];
+			if (index < 0)
+			{
+				HideTodoGroup();
+				_selectedGroup = null;
+			}
+			else
+			{
+				_showTodoGroup = true;
+				_selectedGroup = _visibleGroups[index];
+			}
 			SetSelectedTodo(null);
 			Repaint();
 		}

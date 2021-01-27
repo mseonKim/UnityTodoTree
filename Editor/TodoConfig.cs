@@ -132,7 +132,13 @@ namespace UnityEditor.Todo
 		}
 
 		public void AddTag(ref Tag tag) { _tags.Add(tag); }
-		public void RemoveTag(ref Tag tag) { _tags.Remove(tag); }
+		public void RemoveTag(ref Tag tag)
+		{
+			if (_tags.Count < 2)
+				return;
+				
+			_tags.Remove(tag);
+		}
 
 		public void AdjustConfigIndices()
 		{
