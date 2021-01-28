@@ -12,6 +12,8 @@ namespace UnityEditor.Todo
         public Tag tag;
         public UnityEngine.Object reference;
 
+        [HideInInspector]
+        public bool isVisible = true;
 
         [SerializeField]
         private List<Todo> _todos;

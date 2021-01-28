@@ -21,7 +21,8 @@ namespace UnityEditor.Todo
 
         private static void OnPostHeaderGUI(Editor editor)
         {
-            if (editor.target && _config != null && _data != null)
+            if (editor.target && _config != null
+                && _data != null && _config.inpsectorGUI)
             {
                 if (!typeof(UnityEngine.Object).IsAssignableFrom(editor.target.GetType()))
                     return;

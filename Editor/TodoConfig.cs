@@ -52,6 +52,7 @@ namespace UnityEditor.Todo
 
 	public class TodoConfig : ScriptableObject
 	{
+		public bool inpsectorGUI = true;
 		[SerializeField]
 		private List<Tag> _tags;
 		public List<Tag> tags { get { return _tags; } }
@@ -136,7 +137,7 @@ namespace UnityEditor.Todo
 		{
 			if (_tags.Count < 2)
 				return;
-				
+
 			_tags.Remove(tag);
 		}
 

@@ -15,15 +15,16 @@ namespace UnityEditor.Todo
 		private string _todoDatabasePath = "Assets/Editor/TodoTree/TodoDatabase.asset";
 		private TodoConfig _config;
 		private TodoDatabase _data;
-		private List<TodoGroup> _visibleGroups;
 
 		// Controllers
+		private List<TodoGroup> _currentGroups;
 		private Tag _currentTag;
 		private TodoGroup _selectedGroup;
 		private Todo _selectedTodo;
 		private bool _showTodoGroup;
 		private bool _hasSelectedTodoChanged;
-		private string _searchString;
+		private string _searchString = "";
+		private string _preSearchString = "";
 		private Vector2 _sidebarScrollPos;
         private Vector2 _todoAreaScrollPos;
 		private bool _hasTodoDragStarted;
@@ -58,7 +59,7 @@ namespace UnityEditor.Todo
 			Toolbar();
 			using (new HorizontalGroup())
 			{
-				if (_visibleGroups != null)
+				if (_currentGroups != null)
 				{
 					Sidebar();
 					TodoArea();
@@ -137,10 +138,13 @@ namespace UnityEditor.Todo
 				using (new ScrollViewGroup(ref _sidebarScrollPos))
 				{
 					// Fill contents
-					for (int i = 0; i < _visibleGroups.Count; i++)
+					for (int i = 0; i < _currentGroups.Count; i++)
 					{
-						TodoGroupField(i);
-						GUILayout.Space((float)TodoLayout.SidebarSpace);
+						if (_searchString.Length == 0 || _currentGroups[i].isVisible)
+						{
+							TodoGroupField(i);
+							GUILayout.Space((float)TodoLayout.SidebarSpace);
+						}
 					}
 				}
 
@@ -193,7 +197,8 @@ namespace UnityEditor.Todo
 						// Show todo field
 						Todo todo = _selectedGroup.todos[i];
 						bool hasModified = false;
-						TodoField(i, ref todo, ref hasModified);
+						if (_searchString.Length == 0 || todo.isVisible)
+							TodoField(i, ref todo, ref hasModified);
 
 						// Break if modified
 						if (hasModified)
@@ -276,7 +281,38 @@ namespace UnityEditor.Todo
                 GUI.FocusControl(null);
             }
 
-			// TODO: implement search
+			_searchString = _searchString.Trim();
+			SearchTodos();
+		}
+
+		private void SearchTodos()
+		{
+			// Return if no data or no need to search again
+			if (_currentGroups == null || _searchString.Equals(_preSearchString))
+				return;
+
+			// Rollback to before search
+			if (_searchString.Length < 1)
+			{
+				RefreshCurrentGroups();
+				return;
+			}
+			
+			// Search
+			foreach (TodoGroup group in _currentGroups)
+			{
+				bool hasVisibleTodo = false;
+				foreach (Todo todo in group.todos)
+				{
+					todo.isVisible = todo.title.ToLower().Contains(_searchString.ToLower());
+					if (todo.isVisible)
+						hasVisibleTodo = true;
+				}
+				group.isVisible = hasVisibleTodo;
+			}
+
+			// Update preSearchString
+			_preSearchString = _searchString;
 		}
 
 
@@ -284,14 +320,14 @@ namespace UnityEditor.Todo
 		private void TodoGroupField(int index)
 		{
 			Event e = Event.current;
-			TodoGroup group = _visibleGroups[index];
+			TodoGroup group = _currentGroups[index];
 			GUIStyle labelStyle = EditorStyles.label;
 
 			// Set style depends on whether selected group
 			if (_selectedGroup != null)
 			{
 				Color backgroundColor = group.tag.color == Color.white ? Color.black : group.tag.color;
-				if (_selectedGroup == _visibleGroups[index])
+				if (_selectedGroup == _currentGroups[index])
 				{
 					GUI.backgroundColor = backgroundColor;
 					labelStyle = EditorStyles.boldLabel;
@@ -367,7 +403,7 @@ namespace UnityEditor.Todo
 					if (tagIndex != _selectedGroup.tag.index)
 					{
 						_selectedGroup.tag = _config.GetTagByIndex(tagIndex);
-						RefreshVisibleGroups();
+						RefreshCurrentGroups();
 					}
 					_selectedGroup.tag.color = EditorGUILayout.ColorField(_selectedGroup.tag.color, GUILayout.Width((float)TodoLayout.TagColorWidth), GUILayout.Height((float)TodoLayout.TodoGroupTitleHeight));
 				}
@@ -413,7 +449,7 @@ namespace UnityEditor.Todo
 			{
 				TodoGroup group = new TodoGroup(defaultName, _currentTag ?? _config.GetTagByIndex(0));
 				_data.AddGroup(ref group);
-				RefreshVisibleGroups();
+				RefreshCurrentGroups();
 			}
 		}
 
@@ -427,7 +463,7 @@ namespace UnityEditor.Todo
 				if (_selectedGroup.todos.Count == 0)
 				{
 					_data.RemoveGroup(ref _selectedGroup);
-					RefreshVisibleGroups();
+					RefreshCurrentGroups();
 					SetSelectedGroup(-1);
 				}
 			}
@@ -569,13 +605,13 @@ namespace UnityEditor.Todo
 		{
 			await Task.Delay(10);
 			_currentTag = tag;
-			RefreshVisibleGroups();
+			RefreshCurrentGroups();
 			HideTodoGroup();
 		}
 
-		private void RefreshVisibleGroups()
+		private void RefreshCurrentGroups()
 		{
-			_visibleGroups = _data.GetVisibleGroups(_currentTag);
+			_currentGroups = _data.GetVisibleGroups(_currentTag);
 			Repaint();
 		}
 
@@ -590,7 +626,7 @@ namespace UnityEditor.Todo
 			else
 			{
 				_showTodoGroup = true;
-				_selectedGroup = _visibleGroups[index];
+				_selectedGroup = _currentGroups[index];
 			}
 			SetSelectedTodo(null);
 			Repaint();
@@ -603,6 +639,10 @@ namespace UnityEditor.Todo
 
 		private void RearrangeTodoFields(ref Event e, int index)
 		{
+			// Return if searching
+			if (_searchString.Length > 0)
+				return;
+
 			Rect fieldRect = GUILayoutUtility.GetLastRect();
 
 			if (e.isMouse)

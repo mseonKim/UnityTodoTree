@@ -18,6 +18,9 @@ namespace UnityEditor.Todo
 		public DateTime? createdDate { get; }
 		public DateTime? endDate;
 
+		[HideInInspector]
+        public bool isVisible = true;
+
 		public Todo()
 		{
 			title = "new todo";
