@@ -27,6 +27,9 @@ namespace UnityEditor.Todo
                 if (!typeof(UnityEngine.Object).IsAssignableFrom(editor.target.GetType()))
                     return;
 
+                if (typeof(UnityEngine.GameObject).Equals(editor.target.GetType()))
+                    return;
+
                 using (new HorizontalGroup())
                 {
                     GUILayout.Label("TODO Tree", GUILayout.Width(Screen.width / 3f));

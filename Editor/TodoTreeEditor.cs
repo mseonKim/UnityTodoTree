@@ -281,7 +281,7 @@ namespace UnityEditor.Todo
                 GUI.FocusControl(null);
             }
 
-			_searchString = _searchString.Trim();
+			_searchString = _searchString.TrimStart();
 			SearchTodos();
 		}
 
@@ -412,7 +412,7 @@ namespace UnityEditor.Todo
 				using (new HorizontalGroup())
 				{
 					GUILayout.Label("Asset ", GUILayout.ExpandWidth(false));
-					_selectedGroup.reference = EditorGUILayout.ObjectField(_selectedGroup.reference, typeof(UnityEngine.Object), true);
+					_selectedGroup.reference = EditorGUILayout.ObjectField(_selectedGroup.reference, typeof(UnityEngine.Object), false);
 				}
 
 				// Note
