@@ -8,7 +8,7 @@
         "todotree"
     ],
     "category": "Todo",
-	"description": "The TODO Tree for Unity\n\nSupport Features:\n\n    1. Tag\t\t(TODO, FIXME)\n    2. Prority\t(Minor, Medium, Major)\n    3. Progress\t(Active, On-Hold, Completed)\n\nCan edit settings in the TodoConfig asset.",
+	"description": "The TODO Tree for Unity\n\nSupport Features:\n\n    1. Tag\t\t(TODO, FIXME)\n    2. Prority\t(Minor, Medium, Major)\n    3. Progress\t(Active, On-Hold, Completed)\n    4. Reorder\t(Drag & Drop the todo)\n\nYou can edit settings in the TODOTree window or\nmanually add more custom items (tag, priority, progress) to the TodoConfig asset.\n\nIf you want to hide todo buttons in each inspector, you can turn off the 'Inspector GUI' on the TodoConfig asset.",
     "dependencies": {
     }
 }

@@ -1,5 +1,6 @@
 # Unity Todo Tree
-The TODO Tree for Unity Editor (recommend version: >=2019.4)
+The TODO Tree for Unity Editor
+- recommend version: >=2019.4(LTS)
 
 
 ## Support Features
@@ -9,7 +10,8 @@ The TODO Tree for Unity Editor (recommend version: >=2019.4)
   3. Progress (Active, On-Hold, Completed)
   4. Reorder (Drag & Drop the todo)
 
-You can add your custom settings in TodoConfig.asset. (+ color for each of them)
+You can edit settings in the TODO Tree window or
+manually add more custom items (tag, priority, progress) to the TodoConfig asset. (+ color for each of them)
 
 
 ## Example
