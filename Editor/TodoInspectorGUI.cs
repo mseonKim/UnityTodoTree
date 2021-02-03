@@ -38,10 +38,20 @@ namespace UnityEditor.Todo
                         GUIContent content = new GUIContent("New " + _config.tags[i].name);
                         if (GUILayout.Button(content))
                         {
-                            TodoGroup newGroup = new TodoGroup(editor.target.name, _config.tags[i]);
-                            newGroup.reference = editor.target;
+                            TodoGroup newGroup;
+                            if (editor.target.name.Trim().Length > 0)
+                            {
+                                newGroup = new TodoGroup(editor.target.name, _config.tags[i]);
+                                newGroup.reference = editor.target;
+                            }
+                            else
+                            {
+                                string assetPath = AssetDatabase.GetAssetOrScenePath(editor.target);
+                                string[] splitPath = assetPath.Split('/');
+                                newGroup = new TodoGroup(splitPath[splitPath.Length - 1].Split('.')[0], _config.tags[i]);
+                                newGroup.reference = AssetDatabase.LoadAssetAtPath<UnityEngine.Object>(assetPath);
+                            }
                             _data.AddGroup(ref newGroup);
-
                             EditorUtility.SetDirty(_data);
                             AssetDatabase.SaveAssets();
                         }
