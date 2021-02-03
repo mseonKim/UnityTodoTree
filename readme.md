@@ -2,6 +2,9 @@
 The TODO Tree for Unity Editor
 - recommend version: >=2019.4(LTS)
 
+## How To Use
+Open TODO Tree editor located in "Window -> TODO Tree" at the top bar.
+
 
 ## Support Features
 
