@@ -248,9 +248,18 @@ namespace UnityEditor.Todo
 					{
 						tag.name = GUILayout.TextField(tag.name);
 
+						GUIContent content = new GUIContent("-", "Remove this tag");
+						if (_currentGroups.Count > 0)
+						{
+							content.tooltip = "Can't remove this tag because it has an item.";
+							GUI.enabled = false;
+						}
+
 						// Remove tag button
-						if (GUILayout.Button("-"))
+						if (GUILayout.Button(content))
 							_config.RemoveTag(ref tag);
+
+						GUI.enabled = true;
 					}
 				}
 				else
@@ -262,7 +271,8 @@ namespace UnityEditor.Todo
 			}
 
 			// Add button
-			if (GUILayout.Button("+"))
+			GUIContent addButtonContent = new GUIContent("+", "Create a new tag");
+			if (GUILayout.Button(addButtonContent))
 			{
 				string defaultName = "NEW TAG";
 				Tag newTag = new Tag(defaultName, Color.white, _config.GetTagCount());
@@ -443,9 +453,10 @@ namespace UnityEditor.Todo
 
 		private void TodoAddGroupField()
 		{
-			const string defaultName = "New Asset"; 
+			const string defaultName = "New Asset";
+			GUIContent content = new GUIContent("+", "Create a new " + (_currentTag?.name ?? "TODO") + " asset");
 			// Create new group
-			if (GUILayout.Button("+", GUILayout.Height((float)TodoLayout.CreateGroupButtonHeight)))
+			if (GUILayout.Button(content, GUILayout.Height((float)TodoLayout.CreateGroupButtonHeight)))
 			{
 				TodoGroup group = new TodoGroup(defaultName, _currentTag ?? _config.GetTagByIndex(0));
 				_data.AddGroup(ref group);
@@ -458,15 +469,20 @@ namespace UnityEditor.Todo
 			if (_selectedGroup == null || _showTodoGroup == false)
 				return;
 
-			if (GUILayout.Button("-", GUILayout.Height((float)TodoLayout.CreateGroupButtonHeight)))
+			GUIContent content = new GUIContent("-", "Remove this " + _selectedGroup.tag.name + " asset");
+			if (_selectedGroup.todos.Count > 0)
 			{
-				if (_selectedGroup.todos.Count == 0)
-				{
-					_data.RemoveGroup(ref _selectedGroup);
-					RefreshCurrentGroups();
-					SetSelectedGroup(-1);
-				}
+				GUI.enabled = false;
+				content.tooltip = "Can't remove this asset because it has an item.";
 			}
+			
+			if (GUILayout.Button(content, GUILayout.Height((float)TodoLayout.CreateGroupButtonHeight)))
+			{
+				_data.RemoveGroup(ref _selectedGroup);
+				RefreshCurrentGroups();
+				SetSelectedGroup(-1);
+			}
+			GUI.enabled = true;
 		}
 
 		private void HideTodoGroup()
@@ -573,7 +589,9 @@ namespace UnityEditor.Todo
 				GUIStyle style = new GUIStyle(GUI.skin.button);
 				style.fontSize = 14;
 				style.fontStyle = FontStyle.Bold;
-				if (GUILayout.Button("x", style, GUILayout.Height(spaceHeight + 8f)))
+				GUIContent content = new GUIContent("x", "Remove this " + _selectedGroup.tag.name);
+
+				if (GUILayout.Button(content, style, GUILayout.Height(spaceHeight + 8f)))
 				{
 					_selectedGroup.RemoveTodo(ref todo);
 					hasModified = true;
@@ -587,8 +605,9 @@ namespace UnityEditor.Todo
 			int originalButtonFontSize = GUI.skin.button.fontSize;
 			GUI.skin.button.fontSize = 18;
 			GUI.skin.button.fontStyle = FontStyle.Bold;
+			GUIContent content = new GUIContent("+", "Create a new " + _selectedGroup.tag.name);
 
-			if (GUILayout.Button("+", GUILayout.Height(25f)))
+			if (GUILayout.Button(content, GUILayout.Height((float)TodoLayout.TodoAddButtonHeight)))
 			{
 				string defaultName = _selectedGroup.tag.name + " " + (_selectedGroup.todos.Count + 1);
 				Todo todo = new Todo(defaultName, "", _config.GetProgressByIndex(0), _config.GetPriorityByIndex(0), null);

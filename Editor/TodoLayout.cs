@@ -18,7 +18,8 @@ namespace UnityEditor.Todo
 		TagColorWidth = 50,
 		TodoFieldHeight = 90,
 		MinTodoTitleWidth = 100,
-		MinPriorityPopupWidth = 80
+		MinPriorityPopupWidth = 80,
+		TodoAddButtonHeight = 28
 	}
 
 	public class HorizontalGroup: IDisposable
