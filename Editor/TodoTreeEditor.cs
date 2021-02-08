@@ -257,7 +257,9 @@ namespace UnityEditor.Todo
 
 						// Remove tag button
 						if (GUILayout.Button(content))
+						{
 							_config.RemoveTag(ref tag);
+						}
 
 						GUI.enabled = true;
 					}
@@ -697,6 +699,10 @@ namespace UnityEditor.Todo
 		}
 
 
+		public void OnDisable()
+		{
+			SaveTodoTree();
+		}
 		public void OnDestroy()
 		{
 			SaveTodoTree();
