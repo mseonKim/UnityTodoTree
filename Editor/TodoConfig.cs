@@ -101,9 +101,9 @@ namespace UnityEditor.Todo
 		}
 
 		public int GetTagCount() { return _tags.Count; }
-		public Tag GetTagByIndex(int index) { return _tags[index]; }
-		public Priority GetPriorityByIndex(int index) { return _priorities[index]; }
-		public Progress GetProgressByIndex(int index) { return _progresses[index]; }
+		public Tag GetTagByIndex(int index) { return index < _tags.Count ? _tags[index] : _tags[0]; }
+		public Priority GetPriorityByIndex(int index) { return index < _priorities.Count ? _priorities[index] : _priorities[0]; }
+		public Progress GetProgressByIndex(int index) { return index < _progresses.Count ? _progresses[index] : _progresses[0]; }
 
 		public string[] GetTagNames()
 		{

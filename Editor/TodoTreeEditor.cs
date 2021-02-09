@@ -612,7 +612,7 @@ namespace UnityEditor.Todo
 			if (GUILayout.Button(content, GUILayout.Height((float)TodoLayout.TodoAddButtonHeight)))
 			{
 				string defaultName = _selectedGroup.tag.name + " " + (_selectedGroup.todos.Count + 1);
-				Todo todo = new Todo(defaultName, "", _config.GetProgressByIndex(0), _config.GetPriorityByIndex(0), null);
+				Todo todo = new Todo(defaultName, "", _config.GetProgressByIndex(1), _config.GetPriorityByIndex(1), null);
 				_selectedGroup.AddTodo(ref todo);
 			}
 
