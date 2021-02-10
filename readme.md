@@ -19,12 +19,15 @@ manually add more custom items (tag, priority, progress) to the _TodoConfig_ ass
 
 If you don't see the quick inspector buttons, please reopen Unity editor after you open the TODO Tree window.
 
+
 ## TodoConfig
+![image](https://user-images.githubusercontent.com/77778881/107454666-d18be100-6b90-11eb-96a1-8d7e73fe515d.png)
+
 Located in _"Assets/Editor/TodoTree"_ directory.
 You can modify the default names and colors in tag, priority, progress.
 If you don't want to see the quick create buttons on inspector, just uncheck _"Inspector GUI"_.
 
-**Please Note**
+**Please Note:**
 * The _Tags_ should contain at least 2 items.
 * The _Priorities_ and _Progresses_ should contain at least 1 item.
 * If you change any name in the _TodoConfig_ asset, close the TODO Tree tab and reopen it to let it sync them.
