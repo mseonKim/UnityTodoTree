@@ -701,7 +701,10 @@ namespace UnityEditor.Todo
 
 		public void OnDisable()
 		{
-			SaveTodoTree();
+			if (!EditorApplication.isPlayingOrWillChangePlaymode)
+			{
+				SaveTodoTree();
+			}
 		}
 		public void OnDestroy()
 		{
