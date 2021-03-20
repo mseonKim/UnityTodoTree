@@ -52,12 +52,16 @@ namespace UnityEditor.Todo
 
 	public class TodoConfig : ScriptableObject
 	{
+		[Tooltip("Show quick create buttons in the inspector.")]
 		public bool inpsectorGUI = true;
+		[Tooltip("The Tags should contain at least 2 items.")]
 		[SerializeField]
 		private List<Tag> _tags;
 		public List<Tag> tags { get { return _tags; } }
+		[Tooltip("The Priorities should contain at least 1 item.")]
 		[SerializeField]
 		private List<Priority> _priorities;
+		[Tooltip("The Progresses should contain at least 1 item.")]
 		[SerializeField]
 		private List<Progress> _progresses;
 
