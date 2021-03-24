@@ -2,6 +2,8 @@
 The TODO Tree for Unity Editor
 - recommend version: >=2019.4(LTS)
 
+![image](https://user-images.githubusercontent.com/77778881/105460595-5d67c700-5ccf-11eb-8c8b-217fc66744bd.png)
+
 ## How To Use
 Open TODO Tree editor located in "Window -> TODO Tree" at the top bar.
 
@@ -32,8 +34,3 @@ If you don't want to see the quick create buttons on inspector, just uncheck _"I
 * The _Priorities_ and _Progresses_ should contain at least 1 item.
 * If you change any name in the _TodoConfig_ asset, close the TODO Tree tab and reopen it to let it sync them.
 * The quick inspector buttons only support the default 2 tags (TODO, FIXME). Of course, the names would be different if you modified them already.
-
-
-## Example
-
-![image](https://user-images.githubusercontent.com/77778881/105460595-5d67c700-5ccf-11eb-8c8b-217fc66744bd.png)
